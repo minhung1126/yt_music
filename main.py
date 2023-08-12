@@ -3,6 +3,35 @@ import subprocess
 
 CWD = os.getcwd()
 
+def update():
+    import sys
+    sys.dont_write_bytecode = True
+    
+    import requests
+
+    # update yt-dlp
+
+    yt_dlp_version_info_url = 'https://raw.githubusercontent.com/minhung1126/YTDL/main/ytdlp_version_info.py'
+    resp = requests.get(yt_dlp_version_info_url)
+
+    version_dict = {}
+    exec(resp.text, globals(), version_dict)
+
+    YT_DLP_VERSION_CHANNEL, YT_DLP_VERSION_TAG = version_dict['YT_DLP_VERSION_CHANNEL'], version_dict['YT_DLP_VERSION_TAG']
+    
+    subprocess.run([
+        'yt-dlp', '--update-to', f'{YT_DLP_VERSION_CHANNEL}@{YT_DLP_VERSION_TAG}',
+    ])
+    
+    new_main_url = "https://raw.githubusercontent.com/minhung1126/yt_music/main/main.py"
+    resp = requests.get(new_main_url)
+
+    with open(os.path.join(CWD, 'main.py'), 'w', encoding='utf-8') as f:
+        f.write(resp.text)
+    
+    return
+
+
 class Playlist():
     def __init__(self, playlist_url) -> None:
         self.playlist_url = playlist_url
@@ -86,13 +115,14 @@ class Playlist():
     
 
 def main():
+    update()
     try:
         user_input = input("Enter a playlist url to donwload or 'update' to update or Ctrl-c to exit: ")
     except KeyboardInterrupt:
         ...
 
     if user_input == "update":
-        ...
+        update()
     else:
         playlist = Playlist(user_input)
         playlist.download_all()
