@@ -10,7 +10,6 @@ def update():
     import requests
 
     # update yt-dlp
-
     yt_dlp_version_info_url = 'https://raw.githubusercontent.com/minhung1126/YTDL/main/ytdlp_version_info.py'
     resp = requests.get(yt_dlp_version_info_url)
 
@@ -123,6 +122,7 @@ def main():
 
     if user_input == "update":
         update()
+        os.system("PAUSE")
         return
     else:
         playlist = Playlist(user_input)
