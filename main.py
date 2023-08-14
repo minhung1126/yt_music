@@ -23,6 +23,7 @@ def update():
         'yt-dlp', '--update-to', f'{YT_DLP_VERSION_CHANNEL}@{YT_DLP_VERSION_TAG}',
     ])
     
+    # Update code
     new_main_url = "https://raw.githubusercontent.com/minhung1126/yt_music/main/main.py"
     resp = requests.get(new_main_url)
 
@@ -119,10 +120,11 @@ def main():
     try:
         user_input = input("Enter a playlist url to donwload or 'update' to update or Ctrl-c to exit: ")
     except KeyboardInterrupt:
-        ...
+        return
 
     if user_input == "update":
         update()
+        return
     else:
         playlist = Playlist(user_input)
         playlist.download_all()
