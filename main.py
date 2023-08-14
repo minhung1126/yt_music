@@ -116,7 +116,6 @@ class Playlist():
     
 
 def main():
-    update()
     try:
         user_input = input("Enter a playlist url to donwload or 'update' to update or Ctrl-c to exit: ")
     except KeyboardInterrupt:
