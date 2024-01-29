@@ -3,10 +3,11 @@ import subprocess
 
 CWD = os.getcwd()
 
+
 def update():
     import sys
     sys.dont_write_bytecode = True
-    
+
     import requests
 
     # update yt-dlp
@@ -16,19 +17,20 @@ def update():
     version_dict = {}
     exec(resp.text, globals(), version_dict)
 
-    YT_DLP_VERSION_CHANNEL, YT_DLP_VERSION_TAG = version_dict['YT_DLP_VERSION_CHANNEL'], version_dict['YT_DLP_VERSION_TAG']
-    
+    YT_DLP_VERSION_CHANNEL, YT_DLP_VERSION_TAG = version_dict[
+        'YT_DLP_VERSION_CHANNEL'], version_dict['YT_DLP_VERSION_TAG']
+
     subprocess.run([
         'yt-dlp', '--update-to', f'{YT_DLP_VERSION_CHANNEL}@{YT_DLP_VERSION_TAG}',
     ])
-    
+
     # Update code
     new_main_url = "https://raw.githubusercontent.com/minhung1126/yt_music/main/main.py"
     resp = requests.get(new_main_url)
 
     with open(os.path.join(CWD, 'main.py'), 'w', encoding='utf-8') as f:
         f.write(resp.text)
-    
+
     return
 
 
@@ -39,24 +41,26 @@ class Playlist():
         self._META_DIR = os.path.join(CWD, 'meta')
         self._MUSIC_DIR = os.path.join(CWD, 'Music')
 
-        self._META_FILENAME_TEMPLATE = os.path.join(self._META_DIR, '%(playlist)s', '%(title)s')
-        self._MUSIC_FILEMAME_TEMPLATE = os.path.join(self._MUSIC_DIR, '%(playlist)s', '[%(upload_date)s] %(title)s')
-        
+        self._META_FILENAME_TEMPLATE = os.path.join(
+            self._META_DIR, '%(playlist)s', '%(title)s')
+        self._MUSIC_FILEMAME_TEMPLATE = os.path.join(
+            self._MUSIC_DIR, '%(playlist)s', '[%(upload_date)s] %(title)s')
+
         if not os.path.isdir(self._MUSIC_DIR):
             os.mkdir(self._MUSIC_DIR)
 
         self.download_metas()
-    
+
     def download_metas(self):
         subprocess.run([
             'yt-dlp',
-            '--skip-download', 
+            '--skip-download',
             '--write-info-json',
             '--no-write-playlist-metafiles',
+            '--extractor-args', 'youtube:lang=zh-TW,zh-CN',
             '-o', self._META_FILENAME_TEMPLATE,
             self.playlist_url
         ])
-    
 
     def download(self, meta_path):
         # Renew download url
@@ -85,14 +89,13 @@ class Playlist():
 
         if result.returncode == 0:
             os.remove(meta_path)
-        
-        return
 
+        return
 
     def download_all(self):
         if not os.path.isdir(self._META_DIR):
             return
-        
+
         for dirpath, dirnames, filenames in os.walk(self._META_DIR):
             if filenames == []:
                 continue
@@ -101,7 +104,7 @@ class Playlist():
                 if not filename.endswith('.info.json'):
                     continue
                 self.download(meta_path=os.path.join(dirpath, filename))
-        
+
         while True:
             for dirpath, dirnames, filenames in os.walk(self._META_DIR, topdown=False):
                 if dirnames + filenames == []:
@@ -110,13 +113,14 @@ class Playlist():
 
             if os.listdir(self._META_DIR) == []:
                 os.rmdir(self._META_DIR)
-            
+
             break
-    
+
 
 def main():
     try:
-        user_input = input("Enter a playlist url to download or 'update' to update or Ctrl-c to exit: ")
+        user_input = input(
+            "Enter a playlist url to download or 'update' to update or Ctrl-c to exit: ")
     except KeyboardInterrupt:
         return
 
